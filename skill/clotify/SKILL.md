@@ -5,50 +5,65 @@ description: Control Spotify playback from the terminal using the clotify CLI. U
 
 # Clotify — Spotify CLI
 
-Control Spotify playback via the `clotify` CLI. Requires `npm install -g clotify` and `clotify login` (browser OAuth).
+Control Spotify playback via the `clotify` CLI. All commands below are non-interactive and can be run directly via Bash.
 
 ## Prerequisites Check
 
-Before running any command, verify clotify is available:
+Before running any command:
 
 ```bash
 which clotify
 ```
 
-If missing: `npm install -g clotify`. If not authenticated, tell the user to run `clotify login` — it requires browser interaction.
+If missing: `npm install -g clotify`. If not authenticated, tell the user to run `clotify login` interactively.
 
-## Commands
+## Commands — All Non-Interactive
 
-| Command | Interactive |
-|---|---|
-| `clotify open` — Launch Spotify and wait for device | No |
-| `clotify now` — Show currently playing track | No |
-| `clotify play` — Resume playback | No |
-| `clotify pause` — Pause playback | No |
-| `clotify next` — Skip to next track | No |
-| `clotify prev` — Previous track | No |
-| `clotify shuffle` — Toggle shuffle | No |
-| `clotify search <query>` — Search and play a song | Yes |
-| `clotify playlists` — Browse/play/edit playlists | Yes |
-
-## Usage
-
-**Non-interactive commands** — run directly via Bash and relay output to user.
-
-**Interactive commands** (`search`, `playlists`) — instruct the user to run these themselves since they require arrow key selection. Suggest: `! clotify search <query>` or `! clotify playlists`.
+```bash
+clotify open                          # Launch Spotify app, wait until ready
+clotify now                           # Show currently playing track
+clotify play                          # Resume playback
+clotify pause                         # Pause playback
+clotify next                          # Skip to next track
+clotify prev                          # Go to previous track
+clotify shuffle                       # Toggle shuffle on/off
+clotify search "query" --first        # Search and auto-play top result
+clotify playlists --play "name"       # Play a playlist by name (fuzzy match)
+clotify playlists --list              # List all playlists (name | uri)
+```
 
 ## Workflow Patterns
 
-**Start listening:** `clotify open` then tell user to run `! clotify playlists` or `! clotify search <query>`.
+**User wants to play a specific song:**
+```bash
+clotify search "blinding lights" --first
+```
 
-**"What's playing?":** Run `clotify now`, relay the output.
+**User wants to play a playlist:**
+```bash
+clotify playlists --play "Deep Focus"
+```
 
-**"Skip/next/pause/play":** Run the corresponding command directly.
+**User asks "what's playing":**
+Run `clotify now` and relay the output.
 
-**"Play something specific":** Tell user to run `! clotify search <query>`.
+**User says "skip" / "next" / "pause" / "play" / "shuffle":**
+Run the corresponding command directly.
+
+**User wants to start listening from scratch:**
+```bash
+clotify open
+clotify playlists --play "playlist name"
+```
+
+**User wants to see their playlists:**
+```bash
+clotify playlists --list
+```
 
 ## Limitations
 
-- Spotify Premium required
-- Spotify must be running on a device — `clotify open` launches it
-- A song must be playing before play/pause/next/prev work; use playlists or search to start from scratch
+- Spotify Premium required for playback control
+- Spotify must be running — use `clotify open` to launch it
+- A song must be playing before play/pause/next/prev work; use `--play` or `--first` to start from scratch
+- `clotify login` requires browser interaction — cannot be automated

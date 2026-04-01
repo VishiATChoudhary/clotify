@@ -137,12 +137,20 @@ export async function shuffle() {
   console.log(newState ? chalk.green('🔀 Shuffle on.') : chalk.dim('Shuffle off.'));
 }
 
-export async function search(query) {
+export async function search(query, { first = false } = {}) {
   const res = await api('get', `/search?q=${encodeURIComponent(query)}&type=track&limit=10`);
   const tracks = res.data.tracks?.items || [];
 
   if (!tracks.length) {
     console.log(chalk.dim('No results found.'));
+    return;
+  }
+
+  if (first) {
+    const t = tracks[0];
+    await ensureDevice();
+    await api('put', '/me/player/play', { uris: [t.uri] });
+    console.log(chalk.green(`▶ Playing: ${t.name} — ${t.artists.map((a) => a.name).join(', ')}`));
     return;
   }
 
@@ -170,12 +178,30 @@ export async function search(query) {
   }
 }
 
-export async function playlists() {
+export async function playlists({ playName, list } = {}) {
   const res = await api('get', '/me/playlists?limit=50');
   const items = res.data.items.filter(Boolean);
 
   if (!items.length) {
     console.log(chalk.dim('No playlists found.'));
+    return;
+  }
+
+  if (list) {
+    items.forEach((p) => console.log(`${p.name} | ${p.uri}`));
+    return;
+  }
+
+  if (playName) {
+    const match = items.find((p) => p.name.toLowerCase() === playName.toLowerCase())
+      || items.find((p) => p.name.toLowerCase().includes(playName.toLowerCase()));
+    if (!match) {
+      console.log(chalk.red(`No playlist matching "${playName}".`));
+      return;
+    }
+    await ensureDevice();
+    await api('put', '/me/player/play', { context_uri: match.uri });
+    console.log(chalk.green(`▶ Playing: ${match.name}`));
     return;
   }
 

@@ -95,17 +95,20 @@ program
 program
   .command('search <query...>')
   .description('Search for a song and play it')
-  .action((query) => {
+  .option('--first', 'Auto-play the first result (non-interactive)')
+  .action((query, opts) => {
     ensureAuth();
-    search(query.join(' '));
+    search(query.join(' '), { first: opts.first });
   });
 
 program
   .command('playlists')
   .description('Interactive list of playlists — select to play')
-  .action(() => {
+  .option('--play <name>', 'Play a playlist by name (non-interactive)')
+  .option('--list', 'List all playlists (non-interactive)')
+  .action((opts) => {
     ensureAuth();
-    playlists();
+    playlists({ playName: opts.play, list: opts.list });
   });
 
 program.parse();
