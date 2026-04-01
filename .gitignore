@@ -1,0 +1,4 @@
+node_modules/
+.clotify-tokens.json
+.clotify-config.json
+.env
